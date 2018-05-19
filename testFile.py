@@ -1,27 +1,27 @@
 import cv2
 import numpy as np
 import math
+
+
 def nothing(x):
     pass
+
 
 # Camera port declaration and ini
 cameraPort = 1
 camera = cv2.VideoCapture(cameraPort)
 cv2.namedWindow('Edges')
-
-cv2.createTrackbar('lower', 'Edges', 1, 255, nothing)
-cv2.createTrackbar('higher', 'Edges', 1, 255, nothing)
+cv2.createTrackbar('houghParms', 'Edges', 1, 255, nothing)
 
 while camera.isOpened():
-    lower = cv2.getTrackbarPos('lower', 'Edges')
-    higher = cv2.getTrackbarPos('higher', 'Edges')
+    houghParms = cv2.getTrackbarPos('houghParms', 'Edges')
     ret, picture = camera.read()
     grayScale = cv2.cvtColor(picture.copy(), cv2.COLOR_BGR2GRAY)
-    blurred = cv2.bilateralFilter(grayScale, 5, 100, 100)
-    edges = cv2.Canny(blurred, lower, higher)
+    blurred = cv2.bilateralFilter(grayScale, 7, 100, 100)
+    edges = cv2.Canny(blurred, 70, 100)
     minLineLength = 100
     maxLineGap = 10
-    lines = cv2.HoughLines(edges, 1, np.pi / 180.0, 150, None, 0, 0)
+    lines = cv2.HoughLines(edges, 1, np.pi / 180.0, houghParms, None, 0, 0)
     if lines is not None:
         for i in range(0, len(lines)):
             rho = lines[i][0][0]
