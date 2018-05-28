@@ -25,10 +25,10 @@ def computeIntersect(line1, line2):
     p2 = lineToPointPair(line2)
 
     denom = (p1[0][0] - p1[1][0]) * (p2[0][1] - p2[1][1]) - (p1[0][1] - p1[1][1]) * (p2[0][0] - p2[1][0])
-    intersect = (((p1[0][0]*p1[1][1] - p1[0][1]*p1[1][0])*(p2[0][0] - p2[1][0]) -
-                  (p1[0][0] - p1[1][0])*(p2[0][0]*p2[1][1] - p2[0][1]*p2[1][0])) / denom,
-                 ((p1[0][0]*p1[1][1] - p1[0][1]*p1[1][0])*(p2[0][1] - p2[1][1]) -
-                  (p1[0][1] - p1[1][1])*(p2[0][0]*p2[1][1] - p2[0][1]*p2[1][0])) / denom)
+    intersect = (int(((p1[0][0]*p1[1][1] - p1[0][1]*p1[1][0])*(p2[0][0] - p2[1][0]) -
+                      (p1[0][0] - p1[1][0])*(p2[0][0]*p2[1][1] - p2[0][1]*p2[1][0])) / denom),
+                 (int(((p1[0][0]*p1[1][1] - p1[0][1]*p1[1][0])*(p2[0][1] - p2[1][1]) -
+                       (p1[0][1] - p1[1][1])*(p2[0][0]*p2[1][1] - p2[0][1]*p2[1][0])) / denom)))
 
     return intersect
 
@@ -45,11 +45,10 @@ def lineToPointPair(line):
     y0 = rho*sinTheta
     alpha = 1000
 
-    points.append((x0 + alpha * (-sinTheta), int(y0 + alpha * cosTheta)))
-    points.append((x0 - alpha * (-sinTheta), int(y0 - alpha * cosTheta)))
+    points.append((x0 + alpha * (-sinTheta), (y0 + alpha * cosTheta)))
+    points.append((x0 - alpha * (-sinTheta), (y0 - alpha * cosTheta)))
 
     return points
-
 
 # Camera port declaration and ini
 cameraPort = 1
@@ -67,7 +66,6 @@ while camera.isOpened():
     maxLineGap = 10
     lines = cv2.HoughLines(edges, 1, np.pi / 180.0, houghParms, None, 0, 0)
     intersections = []
-    print("LEN: " + str(len(lines)))
     if lines is not None:
         for i in range(0, len(lines)):
             for j in range(0, len(lines)):
@@ -77,17 +75,21 @@ while camera.isOpened():
                     intersection = computeIntersect(line1, line2)
                     intersections.append(intersection)
 
-    if intersections is not None:
-        for intersect in intersections:
-            center = (int(intersect[0]), int(intersect[1]))
+    intersections.sort()
+    d = {x: y for (x, y) in intersections}
+    intersections = list(d.items())
+    filteredIntersections = [s for s in intersections if -1000 < s[1] < 1000]
+    if d is not None:
+        for key, value in d.items():
+            center = (int(key), int(value))
             cv2.circle(picture, center, 5, (0, 255, 0), -1)
 
     cv2.imshow('Camera', picture)
     cv2.imshow('Gray Scale', grayScale)
     cv2.imshow('Edges', edges)
     if cv2.waitKey(1) & 0xFF == ord('p'):
-        print(intersections)
-        intersections.sort()
-        print(intersections)
+        print("directory: " + str(d))
+        print("List: " + str(filteredIntersections))
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
