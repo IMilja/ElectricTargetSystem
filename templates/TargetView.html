@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Electric Target System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</head>
+<header>
+    <div style="margin-top: 5px">
+        <a href="{{ url_for('index') }}"><button type="button" class="btn btn-primary btn-lg">Povratak</button></a>
+    </div>
+</header>
+<body>
+<div class="container" style="margin-top: 10px">
+    <div class="row">
+        <div class="col">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Ocjena pogotka</th>
+                        <th scope="col">X os pomak (cm)</th>
+                        <th scope="col">Y os pomak (cm)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%  for row in range (shotCount) %}
+                    <tr>
+                        {% for column in range(3) %}
+                            <td> {{ shots[row][column] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col">
+
+        </div>
+    </div>
+    <div align="row">
+            <p style="font-size:25px"><b>Ukupan rezultat: {{ result }}</b></p>
+            <a href="{{ url_for('primary_state') }}">
+                <button type="button" class="btn btn-primary btn-lg">Ucitaj pogotke</button>
+            </a>
+            <a href="{{ url_for('primary_state') }}">
+                <button type="button" class="btn btn-primary btn-lg">Resetiraj podatke mete</button>
+            </a>
+    </div>
+</div>
+</body>
+</html>

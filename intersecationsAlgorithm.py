@@ -50,18 +50,24 @@ def lineToPointPair(line):
 
     return points
 
+
 # Camera port declaration and ini
-cameraPort = 1
+cameraPort = 0
 camera = cv2.VideoCapture(cameraPort)
 cv2.namedWindow('Edges')
 cv2.createTrackbar('houghParms', 'Edges', 150, 255, nothing)
+cv2.createTrackbar('higher', 'Edges', 150, 255, nothing)
+cv2.createTrackbar('lower', 'Edges', 150, 255, nothing)
+fgbg = cv2.createBackgroundSubtractorMOG2()
 
 while camera.isOpened():
     houghParms = cv2.getTrackbarPos('houghParms', 'Edges')
+    higher = cv2.getTrackbarPos('higher', 'Edges')
+    lower = cv2.getTrackbarPos('lower', 'Edges')
     ret, picture = camera.read()
     grayScale = cv2.cvtColor(picture.copy(), cv2.COLOR_BGR2GRAY)
     blurred = cv2.bilateralFilter(grayScale, 7, 100, 100)
-    edges = cv2.Canny(blurred, 70, 100)
+    edges = cv2.Canny(blurred, lower, higher)
     minLineLength = 100
     maxLineGap = 10
     lines = cv2.HoughLines(edges, 1, np.pi / 180.0, houghParms, None, 0, 0)
@@ -84,7 +90,8 @@ while camera.isOpened():
             center = (int(key), int(value))
             cv2.circle(picture, center, 5, (0, 255, 0), -1)
 
-    cv2.imshow('Camera', picture)
+    fgmask = fgbg.apply(picture)
+    cv2.imshow('Camera', fgmask)
     cv2.imshow('Gray Scale', grayScale)
     cv2.imshow('Edges', edges)
     if cv2.waitKey(1) & 0xFF == ord('p'):
