@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Electric Target System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</head>
+<header>
+    <div style="margin-top: 5px">
+        <a href="{{ url_for('index') }}"><button type="button" class="btn btn-primary btn-lg">Povratak</button></a>
+    </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</header>
+<body>
+    <div style="width: 350px; padding-left: 25px">
+        <h4>Postavi parametre korekcije</h4>
+        <form action="{{ url_for('get_calibration_params') }}" method="post">
+            <div class="form-group">
+                <label for="target_size">Velicina mete</label>
+                <input class="form-control" type="number" name="target_size" step="0.1"
+                       value="{{ target_size }}" required>
+            </div>
+            <div class="form-group">
+                <label for="field_size">Razmak izmedu brojeva</label>
+                <input class="form-control" type="number" name="field_size" step="0.1"
+                       value="{{ field_size }}" required>
+            </div>
+                <input class="btn btn-primary" type="submit" value="Postavi paramtere">
+        </form>
+    </div>
+</body>
+</html>

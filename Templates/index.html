@@ -13,12 +13,14 @@
         </div>
         <div class="row">
             <div class="col">
-                <a href="/primaryState">
+                <a href="{{ url_for('primary_state') }}">
                     <button type="button" class="btn btn-primary btn-lg">Pokreni metu</button>
                 </a>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-primary btn-lg">Postavke</button>
+                <a href="{{ url_for('settings') }}">
+                    <button type="button" class="btn btn-primary btn-lg">Postavke</button>
+                </a>
             </div>
             <div class="col">
                 <a href="{{ url_for('about_us') }}">

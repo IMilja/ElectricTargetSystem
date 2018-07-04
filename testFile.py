@@ -1,40 +1,21 @@
 import cv2
-import numpy as np
-import math
 
+while True:
+    one_shot_image = cv2.imread("last_reference_image_function.jpg")
+    one_shot_image = cv2.colorChange(one_shot_image, cv2.COLOR_BGR2GRAY)
+    one_shot_image = cv2.threshold(one_shot_image, 0, 255,
+                                   cv2.THRESH_BINARY)[1]
+    _, contours, hierarchy = cv2.findContours(one_shot_image.copy(),
+                                              cv2.RETR_EXTERNAL,
+                                              cv2.CHAIN_APPROX_SIMPLE)
+    for c in contours:
+        epsilon = 0.01 * cv2.arcLength(c, True)
+        approx = cv2.approxPolyDP(c, epsilon, True)
+        (x_position, y_position), radius = cv2.minEnclosingCircle(c)
+        center = (int(x_position), int(y_position))
+        if 0.5 < radius < 10 and len(approx) > 8:
+            cv2.circle(one_shot_image, center, 3, [0, 0, 255], -1, cv2.LINE_AA)
 
-def nothing(x):
-    pass
-
-
-# Camera port declaration and ini
-cameraPort = 1
-camera = cv2.VideoCapture(cameraPort)
-cv2.namedWindow('Edges')
-cv2.createTrackbar('houghParms', 'Edges', 1, 255, nothing)
-
-while camera.isOpened():
-    houghParms = cv2.getTrackbarPos('houghParms', 'Edges')
-    ret, picture = camera.read()
-    grayScale = cv2.cvtColor(picture.copy(), cv2.COLOR_BGR2GRAY)
-    blurred = cv2.bilateralFilter(grayScale, 7, 100, 100)
-    edges = cv2.Canny(blurred, 70, 100)
-    minLineLength = 100
-    maxLineGap = 10
-    lines = cv2.HoughLines(edges, 1, np.pi / 180.0, houghParms, None, 0, 0)
-    if lines is not None:
-        for i in range(0, len(lines)):
-            rho = lines[i][0][0]
-            theta = lines[i][0][1]
-            a = math.cos(theta)
-            b = math.sin(theta)
-            x0, y0 = a * rho, b * rho
-            pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * a))
-            pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * a))
-            cv2.line(picture, pt1, pt2, (0, 0, 255), 2, cv2.LINE_AA)
-
-    cv2.imshow('Camera', picture)
-    cv2.imshow('Gray Scale', grayScale)
-    cv2.imshow('Edges', edges)
+    cv2.imshow('Difference', one_shot_image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import math
 
 # Sorts our points so the picture is correctly rotated
 
@@ -42,14 +41,15 @@ def get_correction_parameters(source_img):
             # order our points by converting them first from a normal list into a numpy array
             source_pts = np.asarray(source_pts, np.float32)
             source_pts = order_points(source_pts)
-
+            print("Source: " + str(source_pts))
+            print(x, y, width, height)
             # create a new numpy array of our desired image format
             dst_points = np.array([
                 [0, 0],
                 [x + width - 1, 0],
                 [x + width - 1, y + height - 1],
                 [0, y + height - 1]], dtype="float32")
-
+            print("Dst: " + str(dst_points))
             return source_pts, dst_points, cnt
 
 
