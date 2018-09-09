@@ -11,6 +11,8 @@ reset = True
 source_pts = []
 dst_points = []
 cnt = None
+x = 0
+y = 0
 target = []
 target_size = 0
 field_size = 0
@@ -24,7 +26,6 @@ camera = cv2.VideoCapture(camera_port)
 
 @app.route('/')
 def index():
-    print(target)
     return render_template('index.html')
 
 
@@ -83,7 +84,7 @@ def search_shot():
                                                    target, target_size)
         shots.append((score, x_position, y_position))
         result += int(score)
-
+        print(shots)
     return render_template('TargetView.html', shotCount=shot_count, shots=shots, result=result)
 
 
@@ -105,22 +106,28 @@ def get_calibration_params():
     global target
     global target_size
     global field_size
-    ret, source_image = camera.read()
-    source_pts, dst_points, cnt = get_correction_parameters(source_image)
-    x, y, width, height = cv2.boundingRect(cnt)
+    while True:
+        ret, source_image = camera.read()
+        source_pts, dst_points, cnt, has_params = get_correction_parameters(source_image)
+        if not has_params:
+            x, y, width, height = cv2.boundingRect(cnt)
+            break
     last_reference_image = np.zeros((int(dst_points[2][1]), int(dst_points[2][0]), 1), np.uint8)
-
     target = []
     target_size = float(request.form['target_size'])
     field_size = float(request.form['field_size'])
-    target_width_pixels = dst_points[2][0] / target_size
-    target_height_pixels = dst_points[2][1] / target_size
-    target_pixels = np.sqrt(target_width_pixels ** 2 + target_height_pixels ** 2)
+    target_width_pixels = (dst_points[2][0]) / target_size
+    print("target_width_pixels:" + str(target_width_pixels))
+    target_height_pixels = (dst_points[2][1]) / target_size
+    print("target_height_pixels:" + str(target_height_pixels))
+    target_pixels = target_height_pixels
     start_point = 0
     for i in range(10):
         start_point += target_pixels * field_size
-        target.append(round(start_point, 2))
-    print(target)
+        target.append(int(start_point))
+        cv2.circle(last_reference_image, (int(dst_points[2][0]/2), int(dst_points[2][1]/2)),
+                   int(start_point), [255, 255, 255], 1, cv2.LINE_AA)
+    cv2.imwrite("last_reference_image_circle.png", last_reference_image)
 
     return redirect('/settings')
 
